@@ -1,33 +1,38 @@
-Identifier: eos0aaa
-Slug: template-model
+Identifier: eos2srx
+Slug: synomega
 Status: In progress
-Title: This is a template model
-Description: |
-  This is a description of the template model.
-  You can use multiple lines in this description.
+Title: Route-Based Synthesizability Score
+Description: Scores how readily a compound can be made by running a 
+  retrosynthetic search against a catalogue of purchasable building blocks, so 
+  the result reflects commercial availability rather than structure alone. A 
+  directed message-passing network trained on a large atom-mapped reaction 
+  corpus proposes disconnections, restricted to templates that split the target 
+  into smaller precursors, and an AND-OR search assembles routes to purchasable 
+  material. Returns a continuous score with the step and precursor counts of the
+  best route. Protecting-group steps are excluded by design.
 Deployment:
   - Local
   - Online
 Source: Local, Online
 Source Type: Internal, Replicated, External
 Task: Annotation, Representation, Sampling
-Subtask: Property calculation or prediction, Activity prediction, Featurization, Projection, Similarity search, Generation
-Input: 
+Subtask: Property calculation or prediction, Activity prediction, Featurization,
+  Projection, Similarity search, Generation
+Input:
   - Compound
 Input Dimension: 1
-Output: 
+Output:
   - Value
   - Score
   - Compound
   - Text
 Output Dimension: 1
 Output Consistency: Fixed, Variable
-Interpretation: |
-  The output of this template model should be interpreted like this.
+Interpretation: The output of this template model should be interpreted like 
+  this.
 Tag:
-  - Tag 1
-  - Tag 2
-  - Tag 3
+  - Synthetic accessibility
+  - Chemical synthesis
 Biomedical Area:
   - Biomedical Area 1
   - Biomedical Area 2
@@ -36,6 +41,7 @@ Target Organism:
   - Target Organism 2
 Publication Type: Peer reviewed, Preprint, Other
 Publication Year: 2026
-Publication: https://example.com
-Source Code: https://example.com
-License: GPL-3.0-or-later, MIT, Apache-2.0...
+Publication: https://doi.org/10.1021/acs.jcim.6c02529
+Source Code: https://github.com/zbc0315/synomega
+License: MIT
+Contributor: TiagoJanela

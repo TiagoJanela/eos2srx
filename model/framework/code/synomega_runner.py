@@ -8,9 +8,10 @@ live under ``model/checkpoints`` and are never downloaded at runtime.
 Two deliberate choices are pinned here rather than left to the package defaults.
 
 * **Search budget.** ``Planner`` defaults to a 60 s / 500-expansion / depth-6 budget. The
-  published benchmark used 8 s, 100 expansions, depth 5 and an expansion width of 10, so
-  those are pinned instead, which both bounds the worst case and keeps the numbers
-  comparable with the paper.
+  published benchmark used 100 expansions, depth 5 and an expansion width of 10, so those
+  are pinned instead, which both bounds the work and keeps the numbers comparable with the
+  paper. The paper's 8 s wall-clock limit is deliberately dropped, because a stopwatch
+  would make the prediction depend on machine load; see the note on ``_TIME_LIMIT``.
 * **Building-block catalogue.** ZINC is published as a gzipped InChIKey list. Loading its
   17.4 million keys into a Python set costs about 2.9 GB of memory, so on first use the
   list is re-encoded once into a SQLite database and afterwards queried through the
@@ -31,18 +32,41 @@ import tempfile
 
 # Output schema. Must stay in lockstep with model/framework/columns/run_columns.csv
 # and with Output Dimension in metadata.yml.
+#
+# These are the authors' own report fields, under the names their published benchmark
+# tables use. Five of the package's fields are not carried, each for a concrete reason
+# rather than preference:
+#
+#   smiles         the input echoed back; Ersilia supplies it
+#   elapsed_s      wall-clock, varies run to run; everything else here is deterministic,
+#                  and a varying column would defeat prediction caching
+#   max_steps      a constant echo of the pinned depth budget, 5 for every molecule
+#   terminated_by  a string, and at this budget nearly redundant with `solved`
+#   error          a string; its information is carried by the all-null row instead
 COLUMNS = [
     "synscore",
     "bb_coverage",
     "solved",
-    "number_of_steps",
-    "number_of_precursors",
-    "number_of_precursors_in_stock",
+    "u",
+    "min_steps",
+    "min_route_depth",
+    "num_routes",
+    "num_leaves",
+    "num_purchasable_leaves",
+    "expansions",
 ]
 
-# Published benchmark budget (paper: top-10 candidates per expansion, 8 s, <=100
-# expansions, depth <=5).
-_TIME_LIMIT = 8.0
+# Published benchmark budget: top-10 candidates per expansion, <=100 expansions, depth <=5.
+#
+# The paper also sets an 8 s wall-clock limit, which is deliberately NOT carried over.
+# A stopwatch makes the prediction depend on how busy the machine is: the same molecule
+# solves on an idle host and comes back unsolved on a loaded one, which contradicts the
+# declared Fixed output consistency and would make cached predictions unreproducible.
+# Measured on a 100-molecule sample under heavy load, 3 targets stopped on time rather
+# than on budget. Dropping the limit changed no answers at all (0/100 solved flags moved)
+# because the expansion cap is what actually binds, and it left the worst case bounded at
+# 6.8 s. Every search parameter that affects which routes are explored is unchanged.
+_TIME_LIMIT = None
 _MAX_EXPANSIONS = 100
 _MAX_DEPTH = 5
 _EXPANSION_WIDTH = 10
@@ -180,9 +204,13 @@ def _to_row(report) -> list:
         report.score,
         report.bb_coverage,
         int(bool(report.solved)),
+        report.num_unpurchasable_leaves,
         report.min_steps,
+        report.min_route_depth,
+        report.num_routes,
         report.num_leaves,
         report.num_purchasable_leaves,
+        report.expansions,
     ]
 
 

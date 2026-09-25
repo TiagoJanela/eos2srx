@@ -22,10 +22,10 @@ Input Dimension: 1
 Output:
   - Score
   - Value
-Output Dimension: 6
+Output Dimension: 10
 Output Consistency: Fixed
-Interpretation: Higher scores indicate a compound more readily synthesised from
-  purchasable building blocks; one means a complete route was found.
+Interpretation: Higher scores indicate easier synthesis from purchasable building
+  blocks; the remaining columns describe the best route found.
 Tag:
   - Synthetic accessibility
   - Chemical synthesis

@@ -19,6 +19,7 @@ eggs/
 .eggs/
 .evc/
 .eosvc/
+install.sh
 lib/
 lib64/
 parts/

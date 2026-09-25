@@ -18,6 +18,7 @@ downloads/
 eggs/
 .eggs/
 .evc/
+.eosvc/
 lib/
 lib64/
 parts/
